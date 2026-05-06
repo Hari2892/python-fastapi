@@ -3,6 +3,9 @@ from app.models import User
 from app.schemas import UserCreate, UserUpdate
 from datetime import datetime
 
+from app.utils.security import hash_password
+from fastapi import HTTPException
+
 def get_users(db: Session):
     return db.query(User).all()
 
@@ -10,10 +13,15 @@ def get_user(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
 
 def create_user(db: Session, user: UserCreate):
+    # Check duplicate email
+    existing_user = db.query(User).filter(User.email == user.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
     db_user = User(
         name=user.name,
         email=user.email,
-        password=user.password,  # ⚠️ hash in real apps!
+        password=hash_password(user.password),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
     )
@@ -27,10 +35,19 @@ def update_user(db: Session, user_id: int, user: UserUpdate):
     if not db_user:
         return None
 
+    # Check email duplication (exclude current user)
+    if user.email:
+        existing_user = db.query(User).filter(
+            User.email == user.email,
+            User.id != user_id
+        ).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already in use")
+
+        db_user.email = user.email
+
     if user.name:
         db_user.name = user.name
-    if user.email:
-        db_user.email = user.email
 
     db_user.updated_at = datetime.utcnow()
 
