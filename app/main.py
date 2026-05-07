@@ -53,3 +53,17 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     if not deleted:
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "User deleted"}
+
+# Update an existing user's password
+@app.put("/user/updatePassword/{user_id}")
+def update_user_password(
+    user_id: int,
+    user: schemas.UserUpdatePassword,
+    db: Session = Depends(get_db)
+):
+    updated = crud.update_user_password(db, user_id, user)
+
+    if not updated:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {"message": "User password updated successfully"}

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models import User
-from app.schemas import UserCreate, UserUpdate
+from app.schemas import UserCreate, UserUpdate, UserUpdatePassword
 from datetime import datetime
 
 from app.utils.security import hash_password
@@ -62,4 +62,19 @@ def delete_user(db: Session, user_id: int):
 
     db.delete(db_user)
     db.commit()
+    return db_user
+
+def update_user_password(db: Session, user_id: int, user: UserUpdatePassword):
+    if not user.password:
+        raise HTTPException(status_code=400, detail="Password should not be empty")
+    
+    db_user = get_user(db, user_id)
+    if not db_user:
+        return None
+    
+    db_user.password = hash_password(user.password)
+    db_user.updated_at = datetime.utcnow()
+
+    db.commit()
+    db.refresh(db_user)
     return db_user
