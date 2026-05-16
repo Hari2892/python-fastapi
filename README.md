@@ -109,8 +109,8 @@ This repository includes a pre-configured Postman collection for testing all API
 ### Hariharan R  
 **Senior PHP & Full-Stack Developer**
 
-- Portfolio: *(https://hariharan-bio-site.netlify.app/)*
-- LinkedIn: *(https://www.linkedin.com/in/hariharan-r-55158515a/)*
+- **[Portfolio](https://hariharan-bio-site.netlify.app/)**
+- **[LinkedIn](https://www.linkedin.com/in/hariharan-r-55158515a/)**
 
 ---
 
